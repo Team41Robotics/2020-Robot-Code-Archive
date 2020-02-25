@@ -227,10 +227,10 @@ public class Turret {
 	 * @param controller
 	 */
 	private void rotate(Joystick controller) {
-		if(!turretZeroed) { // Don't move if not zeroed yet
-			zeroTurret();
-			return;
-		}
+		// if(!turretZeroed) { // Don't move if not zeroed yet
+		// 	zeroTurret();
+		// 	return;
+		// }
 
 		if(!rotateLimit.get()) { // If limit is clicked, zero the encoder
 			rotateEncoder.setPosition(TURRET_ANGLE_MIN);

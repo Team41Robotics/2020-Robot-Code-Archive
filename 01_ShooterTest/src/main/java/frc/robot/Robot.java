@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
 	private Realsense realsense; 
 	private Auton auton;
 
-	public final boolean useHood = true;
+	public final boolean useHood = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
 		realsense = new Realsense();
 		lime = new Limelight(useHood);
 		turret = new Turret(lime);
-		if(useHood) hood = new Hood(lime);
+		//if(useHood) hood = new Hood(lime);
 		drive = new Driving();
 		music = new Music();
 		auton = new Auton(realsense, drive);
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		lime.runLimelight(controller);
 		turret.controllerMove(controller);
-		if(useHood) hood.controllerMove(extraJoy);
+		//if(useHood) hood.controllerMove(extraJoy);
 		drive.controllerMove(controller);
 		
 		// music.playMusic();
