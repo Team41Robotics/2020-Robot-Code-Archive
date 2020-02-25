@@ -40,6 +40,8 @@ public class Robot extends TimedRobot {
 	private Hood hood;
 	private Driving drive;
 	private Music music;
+	private Realsense realsense; 
+	private Auton auton;
 
 	public final boolean useHood = true;
 
@@ -49,11 +51,13 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		realsense = new Realsense();
 		lime = new Limelight(useHood);
 		turret = new Turret(lime);
 		if(useHood) hood = new Hood(lime);
 		drive = new Driving();
 		music = new Music();
+		auton = new Auton(realsense, drive);
 	}
 
 	/**
@@ -61,6 +65,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+
+		realsense.setDestination(COORDINATES.TEST_COORD);
 	}
 
 	/**
@@ -69,7 +75,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 
-		
+		auton.runToPoint();
 	}
 
 	/**

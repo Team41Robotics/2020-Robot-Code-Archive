@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Joystick;
 
@@ -73,5 +74,9 @@ public class Driving {
 		// System.out.println("Left: " + (-talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		difDrive.tankDrive(-leftAxis*speedMultiplier, -rightAxis*speedMultiplier);
 		//if(leftAxis > 0) driveVelocity(0, .5); //.5 radians per second
+	}
+
+	public void driveSpeed(double leftSpeed, double rightSpeed) {
+		difDrive.tankDrive(leftSpeed, rightSpeed);
 	}
 }

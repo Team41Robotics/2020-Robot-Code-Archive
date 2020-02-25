@@ -29,30 +29,23 @@ class Realsense {
 			realsenseInit();
 	}
 
+	public double getAngleFinal() {
+		return angleFinal;
+	}
+
 	public void realsenseInit(){
 		xStart = xRobo.getDouble(0.0);
 		yStart = yRobo.getDouble(0.0);
 		angleStart = angleRobo.getDouble(0.0);
 
-		if(xFinal == 0.0)
-			xFinal = xStart;
-		if(yFinal == 0.0)
-			yFinal = yStart;
-
 		firstRun = false;
 	}
 
-	public double getAngleToDestination() {
-		// double x1 = xRobo.getDouble(0.0);
-		// double y1 = yRobo.getDouble(0.0);
-		// double currentAngle = angleRobo.getDouble(0.0);
-
+	public double getAngleToDestination(){
 		double Dx = xFinal - xStart;
 		double Dy = yFinal - yStart;
 
-		angleFinal = Math.atan( Dy/Dx );
-		
-		return angleFinal - angleStart; //in radians
+		return Math.atan( Dy/Dx ); //in radians
 	}
 
 	public double getDistanceToDestination() {
@@ -65,9 +58,29 @@ class Realsense {
 		return distance;
 	}
 
-	public void setDestination(double x, double y){
-		xFinal = x;
-		yFinal = y;
+	public double getDistanceTraveled() {
+		double Dx = xRobo.getDouble(0.0) - xStart;
+		double Dy = yRobo.getDouble(0.0) - yStart;
+
+		// Just plug into the distance formula
+		double distance = Math.sqrt(Math.pow(Dx,2) + Math.pow(Dy,2)); 
+
+		return distance;
 	}
 
+	public double getCurrentAngle() {
+		double currentAngle = angleRobo.getDouble(0.0);
+		
+		return currentAngle;
+	}
+
+	public void setDestination(Pose dest){
+		xFinal = dest.x;
+		yFinal = dest.y;
+		angleFinal = dest.theta;
+
+		xStart = xRobo.getDouble(0.0);
+		yStart = yRobo.getDouble(0.0);
+		angleStart = angleRobo.getDouble(0.0);
+	}
 }

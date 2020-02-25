@@ -75,20 +75,24 @@ class BUTTONS {
 }
 
 class COORDINATES {
-	public final static Point
-		START_TOP = new Point(0,0),
-		START_MIDDLE = new Point(0,0),
-		START_BOTTOM = new Point(0,0),
-		GOAL = new Point(0,0),
-		TRENCH = new Point(0,0),
-		DISPENSER = new Point(0,0);
+	public final static Pose
+		START_TOP = new Pose(0,0,0),
+		START_MIDDLE = new Pose(0,0,0),
+		START_BOTTOM = new Pose(0,0,0),
+		GOAL = new Pose(0,0,0),
+		TRENCH = new Pose(0,0,0),
+		DISPENSER = new Pose(0,0,0),
+		
+		TEST_COORD = new Pose(1,1,0); //For testing auton
 }
 
-class Point {
-	public final double x, y;
+class Pose {
 
-	public Point(double x, double y) {
+	public final double x, y, theta;
+
+	public Pose(double x, double y, double theta) {
 		this.x = x;
 		this.y = y;
+		this.theta = theta;
 	}
 }
