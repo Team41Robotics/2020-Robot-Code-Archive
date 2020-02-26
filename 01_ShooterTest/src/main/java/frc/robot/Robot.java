@@ -54,7 +54,7 @@ public class Robot extends TimedRobot {
 		realsense = new Realsense();
 		lime = new Limelight(useHood);
 		turret = new Turret(lime);
-		//if(useHood) hood = new Hood(lime);
+		if(useHood) hood = new Hood(lime);
 		drive = new Driving();
 		music = new Music();
 		auton = new Auton(realsense, drive);
@@ -94,11 +94,16 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		lime.runLimelight(controller);
 		turret.controllerMove(controller);
-		//if(useHood) hood.controllerMove(extraJoy);
+		if(useHood) hood.controllerMove(extraJoy);
 		drive.controllerMove(controller);
 		
 		// music.playMusic();
 
+	}
+
+	@Override
+	public void testInit() {
+		realsense.setDestination(COORDINATES.TEST_COORD);
 	}
 
 	/**
@@ -106,5 +111,11 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
+			System.out.println("Reset");
+			realsense.setDestination(COORDINATES.TEST_COORD);
+			auton.setState(Auton.State.NONE);
+		}
+		auton.runToPoint();
 	}
 }

@@ -18,7 +18,7 @@ class Realsense {
 
 		xRobo = realsense.getEntry("xR"); //X coordinate of robot in relation to field
 		yRobo = realsense.getEntry("yR"); //Y coordinate of robot in relation to field
-		angleRobo = realsense.getEntry("angleR"); //Angle of robot in relation to field
+		angleRobo = realsense.getEntry("angle"); //Angle of robot in relation to field CHANGE THIS TO angleR LATER
 		angleReal = realsense.getEntry("angle"); //Angle of Realsense in relation to start
 	
 		firstRun = true;
@@ -41,11 +41,18 @@ class Realsense {
 		firstRun = false;
 	}
 
-	public double getAngleToDestination(){
+	public double getAbsoluteAngleToDestination(){
 		double Dx = xFinal - xStart;
 		double Dy = yFinal - yStart;
 
-		return Math.atan( Dy/Dx ); //in radians
+		double relAngle = Math.atan(Dy/Dx);
+		double absAngle = Dx < 0 ? Math.PI + relAngle : relAngle;
+		
+		if(absAngle > Math.PI) {
+			absAngle = absAngle - (2*Math.PI);
+		}
+
+		return absAngle; //in radians
 	}
 
 	public double getDistanceToDestination() {

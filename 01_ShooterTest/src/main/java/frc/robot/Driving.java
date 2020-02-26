@@ -10,6 +10,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 public class Driving {
 	
+//	public final double METER_PER_ENCODER = 0.0001143; //Found experimentally
+//	public final double RADIAN_PER_ENCODER = 1;
+
 	private WPI_TalonSRX talonRF, talonRB, talonLF, talonLB;
 
 	private SpeedControllerGroup leftSpeedCG, rightSpeedCG;
@@ -27,6 +30,9 @@ public class Driving {
 
 		talonRB.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 		talonLB.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+
+		talonRB.setSelectedSensorPosition(0);
+		talonLB.setSelectedSensorPosition(0);
 
 		leftSpeedCG = new SpeedControllerGroup(talonLF, talonLB);
 		rightSpeedCG = new SpeedControllerGroup(talonRF, talonRB);
@@ -71,7 +77,7 @@ public class Driving {
 
 		double speedMultiplier = 0.55;
 
-		// System.out.println("Left: " + (-talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		System.out.println("Left: " + (-talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		difDrive.tankDrive(-leftAxis*speedMultiplier, -rightAxis*speedMultiplier);
 		//if(leftAxis > 0) driveVelocity(0, .5); //.5 radians per second
 	}

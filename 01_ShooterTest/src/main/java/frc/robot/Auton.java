@@ -7,9 +7,9 @@ public class Auton {
 	private PIDController distancePID, turnPID;
 	private final double DISTANCE_Kp = 1, DISTANCE_Kd = 0, DISTANCE_Ki = 0;
     private final double TURN_Kp = 1, TURN_Kd = 0, TURN_Ki = 0;	
-    private final double TURN_TOLERANCE = .1;
+    private final double TURN_TOLERANCE = .04;
 
-    private enum State {NONE, FIRST_TURN, FORWARD, SECOND_TURN, END};
+    public enum State {NONE, FIRST_TURN, FORWARD, SECOND_TURN, END};
     private State state = State.NONE;
 
     private Realsense realsense;
@@ -29,12 +29,18 @@ public class Auton {
     Negative and abs value less than PI -> turn clockwise
     Negative and abs value more than PI -> turn counterclockwise
     */
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
     public void runToPoint() {		
+        
 		if(state == State.NONE) {
             state = State.FIRST_TURN;
         }
         else if(state == State.FIRST_TURN) {
-            double angle = realsense.getAngleToDestination();
+            double angle = realsense.getAbsoluteAngleToDestination();
             double currentAngle = realsense.getCurrentAngle();
             if(angle - TURN_TOLERANCE < currentAngle && currentAngle < angle + TURN_TOLERANCE)  {
                 state = State.FORWARD; //Switch to 2nd phase
