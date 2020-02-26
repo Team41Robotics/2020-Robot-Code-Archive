@@ -11,7 +11,7 @@ class Realsense {
 
 	private boolean firstRun;
 
-	private double xStart, yStart, xFinal, yFinal, angleStart, angleFinal;
+	private double xStart, yStart, xFinal, yFinal, angleFinal;
 
 	public Realsense() {
 		realsense = NetworkTableInstance.getDefault().getTable("realsense");
@@ -36,7 +36,6 @@ class Realsense {
 	public void realsenseInit(){
 		xStart = xRobo.getDouble(0.0);
 		yStart = yRobo.getDouble(0.0);
-		angleStart = angleRobo.getDouble(0.0);
 
 		firstRun = false;
 	}
@@ -47,7 +46,7 @@ class Realsense {
 
 		double relAngle = Math.atan(Dy/Dx);
 		double absAngle = Dx < 0 ? Math.PI + relAngle : relAngle;
-		
+
 		if(absAngle > Math.PI) {
 			absAngle = absAngle - (2*Math.PI);
 		}
@@ -76,9 +75,8 @@ class Realsense {
 	}
 
 	public double getCurrentAngle() {
-		double currentAngle = angleRobo.getDouble(0.0);
 		
-		return currentAngle;
+		return angleRobo.getDouble(0.0);
 	}
 
 	public void setDestination(Pose dest){
@@ -88,6 +86,5 @@ class Realsense {
 
 		xStart = xRobo.getDouble(0.0);
 		yStart = yRobo.getDouble(0.0);
-		angleStart = angleRobo.getDouble(0.0);
 	}
 }

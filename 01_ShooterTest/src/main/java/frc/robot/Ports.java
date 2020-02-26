@@ -88,7 +88,7 @@ class COORDINATES {
 
 class Pose {
 
-	public final double x, y, theta;
+	public final double x, y, theta; //theta is between -PI and PI
 
 	public Pose(double x, double y, double theta) {
 		this.x = x;

@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
 		if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
 			System.out.println("Reset");
 			realsense.setDestination(COORDINATES.TEST_COORD);
-			auton.setState(Auton.State.NONE);
+			auton.setState(Auton.State.BEGIN);
 		}
 		auton.runToPoint();
 	}
