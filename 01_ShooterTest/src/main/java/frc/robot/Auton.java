@@ -1,12 +1,7 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-
 public class Auton {
     
-	private PIDController distancePID, turnPID;
-	private final double DISTANCE_Kp = 1, DISTANCE_Kd = 0, DISTANCE_Ki = 0;
-    private final double TURN_Kp = 1, TURN_Kd = 0, TURN_Ki = 0;	
     private final double TURN_TOLERANCE = .04;
 
     public enum State {BEGIN, FIRST_TURN, FORWARD, SECOND_TURN, END};
@@ -65,7 +60,7 @@ public class Auton {
         else if(state == State.FORWARD) {
            // Drive forward until distance traveled exceeds the set distance
             if(realsense.getDistanceTraveled() < distance) {
-                drive.driveSpeed(speed, speed); // Change to PID later
+                drive.driveStraight();
             }
             else {
                 // Switch to the 2nd turn and get final angle

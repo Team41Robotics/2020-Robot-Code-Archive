@@ -96,7 +96,8 @@ public class Robot extends TimedRobot {
 		turret.controllerMove(controller);
 		if(useHood) hood.controllerMove(extraJoy);
 		drive.controllerMove(controller);
-		
+		//drive.driveSpeed(.4, .4);
+		//drive.driveStraight();
 		// music.playMusic();
 
 	}
@@ -115,6 +116,10 @@ public class Robot extends TimedRobot {
 			System.out.println("Reset");
 			realsense.setDestination(COORDINATES.TEST_COORD);
 			auton.setState(Auton.State.BEGIN);
+		}
+		if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.R_JOY_CLICK)) {
+			System.out.println("Stop");
+			auton.setState(Auton.State.END);
 		}
 		auton.runToPoint();
 	}
