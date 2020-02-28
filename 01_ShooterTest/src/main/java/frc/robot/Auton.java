@@ -52,12 +52,15 @@ public class Auton {
             } 
             else {
                 // Otherwise, turn in the correct direction
-                if((angle - currentAngle > 0 && angle-currentAngle < Math.PI) || (angle - currentAngle < 0 && Math.abs(angle-currentAngle) > Math.PI))
+                if((angle - currentAngle > 0 && angle-currentAngle < Math.PI) || (angle - currentAngle < 0 && Math.abs(angle-currentAngle) > Math.PI)){
                     drive.driveSpeed(-speed, speed); // Change to PID later
-                else
+                    // System.out.println("If: " + speed);
+                }
+                else{
                     drive.driveSpeed(speed, -speed);
-             
-                System.out.println("Destination angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
+                    // System.out.println("Else: " + speed);
+                }
+                // System.out.println("Destination angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
             }
         }
         else if(state == State.FORWARD) {
@@ -70,7 +73,7 @@ public class Auton {
                 state = State.SECOND_TURN;
                 angle = realsense.getAngleFinal();
             }
-            System.out.println("Distance:" + distance + " traveled:" + realsense.getDistanceTraveled());
+            // System.out.println("Distance:" + distance + " traveled:" + realsense.getDistanceTraveled());
         }
         else if(state == State.SECOND_TURN) {
             
@@ -79,12 +82,16 @@ public class Auton {
                 state = State.END; //Finished
             }
             else {
-                if((angle - currentAngle > 0 && angle-currentAngle < Math.PI) || (angle - currentAngle < 0 && Math.abs(angle-currentAngle) > Math.PI))
-                    drive.driveSpeed(-speed, speed); //Change to PID later
-                else 
+                if((angle - currentAngle > 0 && angle-currentAngle < Math.PI) || (angle - currentAngle < 0 && Math.abs(angle-currentAngle) > Math.PI)){
+                    drive.driveSpeed(-speed, speed); // Change to PID later
+                    // System.out.println("If: " + speed);
+                    // System.out.println("delta Angle: " + (angle-currentAngle));
+                }
+                else{
                     drive.driveSpeed(speed, -speed);
-             
-                System.out.println("Destination angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
+                    // System.out.println("Else: " + speed);
+                }
+                // System.out.println("Destination2 angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
             }
         } else { // Is this necessary?
             drive.driveSpeed(0, 0);

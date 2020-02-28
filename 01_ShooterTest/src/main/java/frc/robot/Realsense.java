@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Joystick;
 
 class Realsense {
 	private NetworkTable realsense;
-	private NetworkTableEntry angleReal, angleRobo, xRobo, yRobo;
+	private NetworkTableEntry sinStartCam, cosStartCam, thetaFieldRobot, xFieldRobot, yFieldRobot;
 
 	private boolean firstRun;
 
@@ -16,11 +16,12 @@ class Realsense {
 	public Realsense() {
 		realsense = NetworkTableInstance.getDefault().getTable("realsense");
 
-		xRobo = realsense.getEntry("xR"); //X coordinate of robot in relation to field
-		yRobo = realsense.getEntry("yR"); //Y coordinate of robot in relation to field
-		angleRobo = realsense.getEntry("angle"); //Angle of robot in relation to field 
-		angleReal = realsense.getEntry("angle"); //Angle of Realsense in relation to start
-	
+		xFieldRobot = realsense.getEntry("xFieldRobot"); //X coordinate of robot in relation to field
+		yFieldRobot = realsense.getEntry("yFieldRobot"); //Y coordinate of robot in relation to field
+		thetaFieldRobot = realsense.getEntry("thetaFieldRobot"); //Angle of robot in relation to field 
+		sinStartCam = realsense.getEntry("sinStartCam"); //Cos of robot in relation to the field
+		cosStartCam = realsense.getEntry("cosStartCam"); //Cos of robot in relation to the field
+
 		firstRun = true;
 	}
 
@@ -34,8 +35,8 @@ class Realsense {
 	}
 
 	public void realsenseInit(){
-		xStart = xRobo.getDouble(0.0);
-		yStart = yRobo.getDouble(0.0);
+		xStart = xFieldRobot.getDouble(0.0);
+		yStart = yFieldRobot.getDouble(0.0);
 
 		firstRun = false;
 	}
@@ -68,8 +69,8 @@ class Realsense {
 	}
 
 	public double getDistanceTraveled() {
-		double Dx = xRobo.getDouble(0.0) - xStart;
-		double Dy = yRobo.getDouble(0.0) - yStart;
+		double Dx = xFieldRobot.getDouble(0.0) - xStart;
+		double Dy = yFieldRobot.getDouble(0.0) - yStart;
 
 		// Just plug into the distance formula
 		double distance = Math.sqrt(Math.pow(Dx,2) + Math.pow(Dy,2)); 
@@ -78,8 +79,15 @@ class Realsense {
 	}
 
 	public double getCurrentAngle() {
-		
-		return angleRobo.getDouble(0.0);
+		// double sinSC = sinStartCam.getDouble(0.0);
+		// double cosSC = cosStartCam.getDouble(0.0);
+		// double sinTar = Math.sin(angleFinal);
+		// double cosTar = Math.cos(angleFinal);
+		// double[][] rotationStartCam = {{cosSC, sinSC},{-sinSC, cosSC}};
+		// double[][] rotationTarget = {{cosTar, -sinTar},{sinTar, cosTar}};
+
+		// return Math.acos(multiplyMatrix(rotationTarget, rotationStartCam)[0][0]);
+		return thetaFieldRobot.getDouble(0.0);
 	}
 
 	public void setDestination(Pose dest){
@@ -87,7 +95,20 @@ class Realsense {
 		yFinal = dest.y;
 		angleFinal = dest.theta;
 
-		xStart = xRobo.getDouble(0.0);
-		yStart = yRobo.getDouble(0.0);
+		xStart = xFieldRobot.getDouble(0.0);
+		yStart = yFieldRobot.getDouble(0.0);
+	} 
+
+	public static double[][] multiplyMatrix(double[][] a, double[][] b) {
+		double[][] product = new double[2][2];
+		for(int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				for (int k = 0; k < 2; k++) {
+					product[i][j] += a[i][k] * b[k][j];
+				}
+			}
+		}
+		return product;
 	}
+
 }

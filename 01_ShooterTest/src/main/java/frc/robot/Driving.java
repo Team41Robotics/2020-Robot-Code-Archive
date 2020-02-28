@@ -108,10 +108,12 @@ public class Driving {
 		double speedMultiplier = 0.55;
 
 		if(driveState != DriveState.DRIVE) {
+			System.out.println("setDrive() Called from Controller");
 			setDrive();
 		}
 
-		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		//System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		//System.out.println("leftAxis: " + -leftAxis*speedMultiplier + " rightAxis: " + -rightAxis*speedMultiplier);
 		difDrive.tankDrive(-leftAxis*speedMultiplier, -rightAxis*speedMultiplier);
 		//if(leftAxis > 0) driveVelocity(0, .5); //.5 radians per second
 	}
@@ -119,10 +121,12 @@ public class Driving {
 	public void driveSpeed(double leftSpeed, double rightSpeed) {
 		
 		if(driveState != DriveState.DRIVE) {
+			System.out.println("setDrive() called from driveSpeed");
 			setDrive();
 		}
 		
-		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		//System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		//System.out.println("LeftSpeed: " + leftSpeed + " RightSpeed: " + rightSpeed);
 		difDrive.tankDrive(leftSpeed, rightSpeed);
 	}
 
