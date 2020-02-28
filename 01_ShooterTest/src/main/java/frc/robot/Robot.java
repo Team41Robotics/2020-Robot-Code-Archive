@@ -92,14 +92,11 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		lime.runLimelight(controller);
-		turret.controllerMove(controller);
-		if(useHood) hood.controllerMove(extraJoy);
+		//lime.runLimelight(controller);
+		//turret.controllerMove(controller);
+		//if(useHood) hood.controllerMove(extraJoy);
 		drive.controllerMove(controller);
-		//drive.driveSpeed(.4, .4);
-		//drive.driveStraight();
-		// music.playMusic();
-
+		//music.playMusic();
 	}
 
 	@Override
@@ -112,6 +109,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		//drive.driveStraight();
 		if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
 			System.out.println("Reset");
 			realsense.setDestination(COORDINATES.TEST_COORD);

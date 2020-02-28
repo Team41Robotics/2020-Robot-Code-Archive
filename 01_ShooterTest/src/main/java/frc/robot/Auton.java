@@ -46,6 +46,9 @@ public class Auton {
             // into the next state
             if(angle - TURN_TOLERANCE < currentAngle && currentAngle < angle + TURN_TOLERANCE)  {
                 state = State.FORWARD;
+                
+                // Reset encoders in prep for driveStraight()
+                drive.resetEncoders();
             } 
             else {
                 // Otherwise, turn in the correct direction
@@ -83,7 +86,7 @@ public class Auton {
              
                 System.out.println("Destination angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
             }
-        } else {
+        } else { // Is this necessary?
             drive.driveSpeed(0, 0);
         }
 	}
