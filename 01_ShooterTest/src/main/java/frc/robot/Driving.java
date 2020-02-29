@@ -25,10 +25,10 @@ public class Driving {
 	private double rightSpeed = 0;
 
 	// For auxiliary PID
-	private final double kP = 1.5, kI = 0.0000, kD = 0;
+	private final double kP = .1, kI = 0.0000, kD = 0; //1.5
 	private final int TIMEOUT_MS = 30;
 
-	public enum DriveState {AUX, DRIVE};
+	public enum DriveState {AUX_STRAIGHT, AUX_TURN, DRIVE};
 	private DriveState driveState = DriveState.DRIVE;
 
 	public Driving() {
@@ -37,22 +37,27 @@ public class Driving {
 		talonLF = new WPI_TalonSRX(PORTS.TALON_LF);
 		talonLB = new WPI_TalonSRX(PORTS.TALON_LB);
 
-		// Auxiliary closed loop driving control using encoder values. Consider changing to velocity drive so we don't have to keep resetting encoder values.
-		// https://phoenix-documentation.readthedocs.io/en/latest/ch16_ClosedLoop.html#auxpid-label
-		// https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java/DriveStraight_AuxQuadrature/src/main/java/frc/robot/Robot.java
-
+		/**
+		 * Auxiliary closed loop driving control using mag encoder values. This will be used to make the robot
+		 * drive straight and do perfect point turns by matching the encoder values on each side. See:
+		 * https://phoenix-documentation.readthedocs.io/en/latest/ch16_ClosedLoop.html#auxpid-label
+		 * https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java/DriveStraight_AuxQuadrature/src/main/java/frc/robot/Robot.java
+		 */
 		talonLB.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, TIMEOUT_MS);
 		
-		// Inverts encoder direction
+		// Inverts left side encoder direction to be in phase with left side motors
 		talonLB.setSensorPhase(true);
 
-		//talonRB.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+		// Selects the mag encoder on the left side to be a remote sensor source for the right side
 		talonRB.configRemoteFeedbackFilter(talonLB.getDeviceID(), RemoteSensorSource.TalonFX_SelectedSensor, 0, TIMEOUT_MS);
 		
-		talonRB.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, TIMEOUT_MS);	// Feedback Device of Remote Talon
+		// Configures a sensor term to be the difference of the encoders. This will be used for driving straight.
+		talonRB.configSensorTerm(SensorTerm.Diff1, FeedbackDevice.RemoteSensor0, TIMEOUT_MS);
 		talonRB.configSensorTerm(SensorTerm.Diff0, FeedbackDevice.CTRE_MagEncoder_Relative, TIMEOUT_MS);
 
-		talonRB.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, TIMEOUT_MS);	
+		// Configures a sensor term to be the sum of the encoders. This will be used for point turns.
+		talonRB.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor0, TIMEOUT_MS);
+		talonRB.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.CTRE_MagEncoder_Relative, TIMEOUT_MS);	
 	
 		// Configures auxiliary PID parameters
 		talonRB.config_kP(1, kP, TIMEOUT_MS);
@@ -60,15 +65,75 @@ public class Driving {
 		talonRB.config_kD(1, kD, TIMEOUT_MS);
 
 		talonRB.configAuxPIDPolarity(false, TIMEOUT_MS);
+
+		// Selects profile slot 1 for auxiliary closed loop
 		talonRB.selectProfileSlot(1, 1);
 
 		resetEncoders();
 
 		leftSpeedCG = new SpeedControllerGroup(talonLF, talonLB);
 		rightSpeedCG = new SpeedControllerGroup(talonRF, talonRB);
-
+		
 		difDrive = new DifferentialDrive(leftSpeedCG, rightSpeedCG);
 	}
+
+		// Resets motor encoder values to 0
+		public void resetEncoders() {
+
+			talonRB.setSelectedSensorPosition(0);
+			talonLB.setSelectedSensorPosition(0);
+		}
+	
+		/**
+		 * For some reason, using the auxiliary PID flips the polarity of the right side motors and the
+		 * right encoder. The driveState keeps track of whether motors and encoders are configured for normal
+		 * driving or aux PID, and setState() configures it accordingly. Look for a better fix, since its annoying. 
+		 */
+		public void setState(DriveState state) {
+	
+			switch(state) {
+				case AUX_STRAIGHT:
+					// Inverts the direction of the right encoder
+					talonRB.setSensorPhase(true);
+					
+					// Inverts right side motor polarity
+					talonRB.setInverted(true);
+					talonRF.setInverted(true);
+	
+					// Configures auxiliarly PID to use the difference of the left and right sensors. Since the robot is
+					// moving straight, the two encoder values should match, so the ideal setpoint is zero.
+					talonRB.configSelectedFeedbackSensor(FeedbackDevice.SensorDifference, 1, TIMEOUT_MS);
+					talonRB.configAuxPIDPolarity(false, TIMEOUT_MS);
+
+					resetEncoders();
+				break;
+	
+				case AUX_TURN:
+					talonRB.setSensorPhase(false);
+	
+					talonRB.setInverted(false);
+					talonRF.setInverted(false);
+	
+					
+					// Configures auxiliary PID to use the sum of the left and right encoders. Since the robot is doing
+					// a point turn, one of the encoders should be in the negative direction, so the ideal setpoint is zero.
+					talonRB.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, 1, TIMEOUT_MS);
+					talonRB.configAuxPIDPolarity(true, TIMEOUT_MS);
+
+					resetEncoders();
+				break;
+	
+				case DRIVE:
+	
+					talonRB.setSensorPhase(false);
+					
+					talonRB.setInverted(false);
+					talonRF.setInverted(false);
+				break;
+			}
+	
+			driveState = state;
+		}
 
 	/**
 	 * <a href="http://www.cs.columbia.edu/~allen/F17/NOTES/icckinematics.pdf">Source Link</a>
@@ -108,22 +173,18 @@ public class Driving {
 		double speedMultiplier = 0.55;
 
 		if(driveState != DriveState.DRIVE) {
-			System.out.println("setDrive() Called from Controller");
-			setDrive();
+			setState(DriveState.DRIVE);
 		}
 		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 
-		//System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		//System.out.println("leftAxis: " + -leftAxis*speedMultiplier + " rightAxis: " + -rightAxis*speedMultiplier);
 		difDrive.tankDrive(-leftAxis*speedMultiplier, -rightAxis*speedMultiplier);
-		//if(leftAxis > 0) driveVelocity(0, .5); //.5 radians per second
 	}
 
 	public void driveSpeed(double leftSpeed, double rightSpeed) {
 		
 		if(driveState != DriveState.DRIVE) {
-			System.out.println("setDrive() called from driveSpeed");
-			setDrive();
+			setState(DriveState.DRIVE);
 		}
 		
 		//System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
@@ -131,53 +192,21 @@ public class Driving {
 		difDrive.tankDrive(leftSpeed, rightSpeed);
 	}
 
-	// For some reason, using the auxiliary PID flips the polarity of the right side motors and the
-	// right encoder. the driveState keeps track of whether motors and encoders are configured for
-	// normal driving or PID, and setAux() or setDrive() configures it accordingly. Look for a better fix.
-	public void setAux() {
-
-		driveState = DriveState.AUX;
-
-		// Inverts the direction of the right encoder
-		talonRB.setSensorPhase(true);
-		
-		// Inverts right side motor polarity
-		talonRB.setInverted(true);
-		talonRF.setInverted(true);
-
-		resetEncoders();
-	}
-
-	public void setDrive() {
-
-		driveState = DriveState.DRIVE;
-
-		talonRB.setSensorPhase(false);
-		
-		talonRB.setInverted(false);
-		talonRF.setInverted(false);
-	}
-
-	// Resets motor encoder values to 0
-	public void resetEncoders() {
-
-		talonRB.setSelectedSensorPosition(0);
-		talonLB.setSelectedSensorPosition(0);
-	}
-
 	// Use auxiliary PID to match left side encoder value and right side encoder value
 	public void driveStraight() {
 
-		if(driveState != DriveState.AUX) {
-			setAux();
+		if(driveState != DriveState.AUX_STRAIGHT) {
+			setState(DriveState.AUX_STRAIGHT);
 		}
 
 		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		
-		// Sets the percent output of the right master motor
-		// The setpoint of the auxiliary PID is greater than zero because the left encoder tends to be always a little higher.
-		// Increasing the setpoint increases the difference between the right minus left encoders.
-		// This is a jank fix, look for another way to match encoder values better
+		/** 
+		 * Sets the percent output of the right master motor.The setpoint of the auxiliary PID is greater
+		 * than zero because the left encoder tends to be always a little higher. Increasing the setpoint
+		 * increases the difference between the right minus left encoders. This is a jank fix, look for 
+		 * another way to match encoder values better.
+		 */
 		talonRB.set(ControlMode.PercentOutput, .3, DemandType.AuxPID, 50);
 	
 		// Sets the other right motor to follow the percent output of the right master motor
@@ -186,5 +215,20 @@ public class Driving {
 		// Sets the two left motors to use the auxiliary PID output of the right master
 		talonLB.follow(talonRB, FollowerType.AuxOutput1);
 		talonLF.follow(talonRB, FollowerType.AuxOutput1);
+	}
+
+	public void pointTurn() {
+		
+		 if(driveState != DriveState.AUX_TURN) {
+		 	setState(DriveState.AUX_TURN);
+		 }
+		
+		//driveSpeed(-.5, .5);
+		 System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		 talonRB.set(ControlMode.PercentOutput, .2, DemandType.AuxPID, 0);
+				
+		 talonRF.follow(talonRB, FollowerType.PercentOutput);
+		 talonLB.follow(talonRB, FollowerType.AuxOutput1);
+		 talonLF.follow(talonRB, FollowerType.AuxOutput1);
 	}
 }

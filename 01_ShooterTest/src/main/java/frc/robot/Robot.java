@@ -110,7 +110,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 		//drive.driveStraight();
-		if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
+		drive.pointTurn();
+		/*if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
 			System.out.println("Reset");
 			realsense.setDestination(COORDINATES.TEST_COORD);
 			auton.setState(Auton.State.BEGIN);
@@ -119,6 +120,6 @@ public class Robot extends TimedRobot {
 			System.out.println("Stop");
 			auton.setState(Auton.State.END);
 		}
-		auton.runToPoint();
+		auton.runToPoint();*/
 	}
 }

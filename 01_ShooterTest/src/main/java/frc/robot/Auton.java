@@ -56,13 +56,13 @@ public class Auton {
                     drive.driveSpeed(-speed, speed); // Change to PID later
                     // System.out.println("If: " + speed);
                 }
-                else{
+                else {
                     drive.driveSpeed(speed, -speed);
                     // System.out.println("Else: " + speed);
                 }
                  System.out.println("Destination angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
-                //System.out.println(realsense.getAngleFinalMatrix());
-                }
+                System.out.println(realsense.getAngleFinalMatrix());
+            }
         }
         else if(state == State.FORWARD) {
            // Drive forward until distance traveled exceeds the set distance
@@ -92,6 +92,7 @@ public class Auton {
                     drive.driveSpeed(speed, -speed);
                     // System.out.println("Else: " + speed);
                 }
+                 System.out.println(realsense.getAngleFinalMatrix());
                  System.out.println("Destination2 angle: " + angle + " Current angle: " + realsense.getCurrentAngle());
             }
         } else { // Is this necessary?
