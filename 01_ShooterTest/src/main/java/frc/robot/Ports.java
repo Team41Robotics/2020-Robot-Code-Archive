@@ -83,7 +83,7 @@ class COORDINATES {
 		TRENCH = new Pose(0,0,0),
 		DISPENSER = new Pose(0,0,0),
 		
-		TEST_COORD = new Pose(.5,-.5,0); //For testing auton
+		TEST_COORD = new Pose(.5,.5,0); //For testing auton
 }
 
 class Pose {

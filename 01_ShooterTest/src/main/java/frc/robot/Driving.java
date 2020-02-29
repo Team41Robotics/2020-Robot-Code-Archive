@@ -111,6 +111,7 @@ public class Driving {
 			System.out.println("setDrive() Called from Controller");
 			setDrive();
 		}
+		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 
 		//System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		//System.out.println("leftAxis: " + -leftAxis*speedMultiplier + " rightAxis: " + -rightAxis*speedMultiplier);
@@ -153,8 +154,8 @@ public class Driving {
 
 		talonRB.setSensorPhase(false);
 		
-		talonRB.setInverted(true);
-		talonRF.setInverted(true);
+		talonRB.setInverted(false);
+		talonRF.setInverted(false);
 	}
 
 	// Resets motor encoder values to 0
@@ -177,7 +178,7 @@ public class Driving {
 		// The setpoint of the auxiliary PID is greater than zero because the left encoder tends to be always a little higher.
 		// Increasing the setpoint increases the difference between the right minus left encoders.
 		// This is a jank fix, look for another way to match encoder values better
-		talonRB.set(ControlMode.PercentOutput, .2, DemandType.AuxPID, 50);
+		talonRB.set(ControlMode.PercentOutput, .3, DemandType.AuxPID, 50);
 	
 		// Sets the other right motor to follow the percent output of the right master motor
 		talonRF.follow(talonRB, FollowerType.PercentOutput);

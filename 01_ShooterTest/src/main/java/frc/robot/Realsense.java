@@ -79,15 +79,18 @@ class Realsense {
 	}
 
 	public double getCurrentAngle() {
-		// double sinSC = sinStartCam.getDouble(0.0);
-		// double cosSC = cosStartCam.getDouble(0.0);
-		// double sinTar = Math.sin(angleFinal);
-		// double cosTar = Math.cos(angleFinal);
-		// double[][] rotationStartCam = {{cosSC, sinSC},{-sinSC, cosSC}};
-		// double[][] rotationTarget = {{cosTar, -sinTar},{sinTar, cosTar}};
-
-		// return Math.acos(multiplyMatrix(rotationTarget, rotationStartCam)[0][0]);
 		return thetaFieldRobot.getDouble(0.0);
+	}
+
+	public double getAngleFinalMatrix() {
+		double sinSC = sinStartCam.getDouble(0.0);
+		double cosSC = cosStartCam.getDouble(0.0);
+		double sinTar = Math.sin(angleFinal);
+		double cosTar = Math.cos(angleFinal);
+		double[][] rotationStartCam = {{cosSC, sinSC},{-sinSC, cosSC}};
+		double[][] rotationTarget = {{cosTar, -sinTar},{sinTar, cosTar}};
+
+		return Math.acos(multiplyMatrix(rotationTarget, rotationStartCam)[0][0]);
 	}
 
 	public void setDestination(Pose dest){
