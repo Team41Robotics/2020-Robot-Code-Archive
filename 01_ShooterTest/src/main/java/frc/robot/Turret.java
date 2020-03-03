@@ -54,9 +54,8 @@ public class Turret {
 		intakeTalon = new TalonSRX(PORTS.INTAKE_TALON);
 		rotateSpark = new CANSparkMax(PORTS.ROTATE_SPARK, MotorType.kBrushless);
 		
-		falconTalon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+		falconTalon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 		// falconTalon.configPulseWidthPeriod_EdgesPerRot(2048, 0);
-		// falconEncoder.setDistancePerPulse(1.0/2048.0 * 60); // Shows encoder data in gearRatio*rpm
 		axleEncoder = new Encoder(PORTS.AXLE_ENCODER_A, PORTS.AXLE_ENCODER_B);
 		axleEncoder.setDistancePerPulse(1.0/2048.0 * 60); // Shows encoder data in rpm
 		rotateEncoder = rotateSpark.getEncoder();
@@ -114,7 +113,8 @@ public class Turret {
 		double falconOutputSpeed = shooterSpeed;
 		if(usePID) {
 			falconOutputSpeed = falconPID.calculate(
-				axleEncoder.getRate()/MAX_FALCON_ENCODER_RATE,
+				//axleEncoder.getRate()/MAX_FALCON_ENCODER_RATE,
+				falconTalon.getSelectedSensorVelocity()/MAX_FALCON_ENCODER_RATE,
 				shooterSpeed
 			);
 			if(shooterSpeed == 0) {
@@ -130,6 +130,8 @@ public class Turret {
 		SmartDashboard.putNumber("shooter encoder rate", axleEncoder.getRate());
 		SmartDashboard.putNumber("falcon current", falconTalon.getSupplyCurrent());
 		SmartDashboard.putNumber("falcon encoder rate", falconTalon.getSelectedSensorVelocity());
+		SmartDashboard.putNumber("shooter speed", shooterSpeed);
+		//System.out.println(falconTalon.getSelectedSensorVelocity());
 		SmartDashboard.putNumber("rotate encoder", rotateEncoder.getPosition());
 		SmartDashboard.putBoolean("rotate limit", !rotateLimit.get());
 

@@ -7,9 +7,6 @@
 
 /**
  * TODO List:
- * 1) Solve pi realsense boot issue
- * 2) Test realsense coordinate system
- * 3) Test autonomous movement
  * 4) Transfer code to final robot
  * 5) Collect shooter data for final robot
  * 6) Boot pi into CLI mode
@@ -95,8 +92,8 @@ public class Robot extends TimedRobot {
 		//lime.runLimelight(controller);
 		//turret.controllerMove(controller);
 		//if(useHood) hood.controllerMove(extraJoy);
-		drive.controllerMove(controller);
-		//music.playMusic();
+		//drive.controllerMove(controller);
+		music.playMusic();
 	}
 
 	@Override
@@ -110,7 +107,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void testPeriodic() {
 		//drive.driveStraight();
-		drive.pointTurn();
+		//drive.pointTurn();
+		drive.driveVelocity(0.0, Math.PI/18.0);
 		/*if(controller.getRawButtonPressed(BUTTONS.GAMEPAD.L_JOY_CLICK)) {
 			System.out.println("Reset");
 			realsense.setDestination(COORDINATES.TEST_COORD);

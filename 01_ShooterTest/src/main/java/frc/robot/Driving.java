@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Joystick;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -141,8 +142,8 @@ public class Driving {
 	 * @param angular Angular velocity to rotate at (in rad/s)
 	 */
 	public void driveVelocity(double linear, double angular) {
-		final double wheelBaseRadius = 0.5969; // Have to find this !!!
-		final double wheelRadius = 0.1; // Have to find this !!!
+		final double wheelBaseRadius = 0.3419; // Have to find this !!!
+		final double wheelRadius = 0.1524 / 2.0; // Have to find this !!!
 		double turnRadius = linear/angular; //v = r*omega
 
 		double velocityLeft = angular*(turnRadius + wheelBaseRadius/2)/wheelRadius;
@@ -151,17 +152,31 @@ public class Driving {
 		double vl = talonLB.getSelectedSensorVelocity();
 		double vr = talonRB.getSelectedSensorVelocity();
 
-		if(vl < velocityLeft && leftSpeed < 1) { //Replace this with PID later?
-			leftSpeed += .001;
+		double inc = 0.01;
+
+		if(vl < velocityLeft) { //Replace this with PID later?
+			leftSpeed += inc;
 		} 
-		else if (vl > velocityLeft && leftSpeed > -1)
-			leftSpeed -= .001;
+		else if (vl > velocityLeft)
+			leftSpeed -= inc;
 		
-		if(vr < velocityRight && rightSpeed < 1) {
-			rightSpeed += .001;
+		if(vr < velocityRight) {
+			rightSpeed += inc;
 		} 
-		else if(vr > velocityRight && rightSpeed > -1)
-			rightSpeed -= .001;
+		else if(vr > velocityRight){
+			rightSpeed -= -inc;
+		}
+		// if(vl < velocityLeft && leftSpeed < 1) { //Replace this with PID later?
+		// 	leftSpeed += inc;
+		// } 
+		// else if (vl > velocityLeft && leftSpeed > -1)
+		// 	leftSpeed -= inc;
+		
+		// if(vr < velocityRight && rightSpeed < 1) {
+		// 	rightSpeed += inc;
+		// } 
+		// else if(vr > velocityRight && rightSpeed > -1)
+		// 	rightSpeed -= -inc;
 
 		difDrive.tankDrive(leftSpeed, rightSpeed);
 	}
@@ -175,10 +190,13 @@ public class Driving {
 		if(driveState != DriveState.DRIVE) {
 			setState(DriveState.DRIVE);
 		}
-		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		// System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 
 		//System.out.println("leftAxis: " + -leftAxis*speedMultiplier + " rightAxis: " + -rightAxis*speedMultiplier);
 		difDrive.tankDrive(-leftAxis*speedMultiplier, -rightAxis*speedMultiplier);
+
+		SmartDashboard.putNumber("left velocity", talonLB.getSelectedSensorVelocity());
+		SmartDashboard.putNumber("right velocity", talonRB.getSelectedSensorVelocity());
 	}
 
 	public void driveSpeed(double leftSpeed, double rightSpeed) {
@@ -199,7 +217,7 @@ public class Driving {
 			setState(DriveState.AUX_STRAIGHT);
 		}
 
-		System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		// System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
 		
 		/** 
 		 * Sets the percent output of the right master motor.The setpoint of the auxiliary PID is greater
@@ -215,6 +233,8 @@ public class Driving {
 		// Sets the two left motors to use the auxiliary PID output of the right master
 		talonLB.follow(talonRB, FollowerType.AuxOutput1);
 		talonLF.follow(talonRB, FollowerType.AuxOutput1);
+
+		
 	}
 
 	public void pointTurn() {
@@ -224,8 +244,8 @@ public class Driving {
 		 }
 		
 		//driveSpeed(-.5, .5);
-		 System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
-		 talonRB.set(ControlMode.PercentOutput, .2, DemandType.AuxPID, 0);
+		 //System.out.println("Left: " + (talonLB.getSelectedSensorPosition()) + " Right: " + talonRB.getSelectedSensorPosition());
+		 talonRB.set(ControlMode.PercentOutput, .3, DemandType.AuxPID, 0);
 				
 		 talonRF.follow(talonRB, FollowerType.PercentOutput);
 		 talonLB.follow(talonRB, FollowerType.AuxOutput1);
